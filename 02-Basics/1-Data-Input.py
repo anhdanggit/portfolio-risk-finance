@@ -7,11 +7,13 @@ Data set: IBM from Yahoo
 import pandas as pd
 import numpy as np
 import scipy as sp
+import pandas_datareader.data as web
 import os 
 
 ## Initial Set-up
 data_input = '00-Data'
 data_ouput = '01-Output'
+
 
 ## Read Data ---------
 ibm_price = pd.read_csv(os.path.join(data_input, 'ibm.csv'))
@@ -24,6 +26,7 @@ mthly_ff.head()
 mthly_ff['date'] = mthly_ff.index
 mthly_ff.reset_index()
 
+
 ## Data Output ---------
 mthly_ff.to_csv(os.path.join(data_ouput, 'mthly_ff.csv'), index=False)
 
@@ -34,6 +37,17 @@ mthly_ff.to_csv(os.path.join(data_ouput, 'mthly_ff.csv'), index=False)
 string = 'Hello World !'
 string.split()
 string.lower()
+
+## Read Data from pandas_reader ---------
+web.get_quote_yahoo('IBM')
+ticker_get = ['IBM', 'AAPL', 'IBM', 'MSFT', 'GOOG']
+all_data = {ticker: web.get_data_yahoo(ticker) for ticker in ticker_get}
+all_data['IBM']['Adj Close']
+
+price = pd.DataFrame({ticker: data['Adj Close'] for ticker, data in all_data.items()})
+volume = pd.DataFrame({ticker: data['Volume'] for ticker, data in all_data.items()})
+
+
 
 ## Mathematics -----------
 g = np.array([[2,2,2],[3,3,3]])
