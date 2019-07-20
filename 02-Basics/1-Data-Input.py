@@ -8,11 +8,14 @@ import pandas as pd
 import numpy as np
 import scipy as sp
 import pandas_datareader.data as web
+from datetime import datetime as dt ## datetime
+import json ## json
+from lxml import objectify
 import os 
 
 ## Initial Set-up
 data_input = '00-Data'
-data_ouput = '01-Output'
+data_output = '01-Output'
 
 
 ## Read Data ---------
@@ -25,6 +28,51 @@ mthly_ff.head()
 ## change the index to one columns
 mthly_ff['date'] = mthly_ff.index
 mthly_ff.reset_index()
+
+## read json
+json_obj = pd.read_json(os.path.join(data_input, 'json_example.json'))
+json_obj 
+
+## read html
+html_tab = pd.read_html(os.path.join(data_input, 'html_example.html'))
+len(html_tab) ## how many table it includes
+tab = html_tab[0].drop('Unnamed: 0', axis=1) 
+tab
+
+## read xml
+parsed = objectify.parse(open(os.path.join(data_input, 'xml_example.xml')))
+root = parsed.getroot()
+
+data = []
+skip_fields = ['PARENT_SEQ', 'INDICATOR_SEQ', 'DESIRED_CHANGE', 'DECIMAL_PLACES']
+
+for elt in root:
+    el_data = {}
+    for child in elt.getchildren():
+        if child.tag in skip_fields:
+            continue
+        el_data[child.tag] = child.pyval
+    data.append(el_data)
+
+data = pd.DataFrame(data)
+
+## HDF5
+frame = pd.DataFrame({'a': np.random.randn(100)})
+store = pd.HDFStore(os.path.join(data_output, 'testdata.h5'))
+
+store['obj1'] = frame
+store['obj1_col'] = frame['a']
+
+store.root ## explore the contents
+
+store.put('obj2', frame, format='table') ## table is slower but support query
+store.select('obj2', where=['index >= 10 and index <= 15'])
+
+path_hdf = os.path.join(data_output, 'testdata.h5')
+frame.to_hdf(path_hdf, 'obj3', format='table')
+pd.read_hdf(path_hdf, 'obj3', where=['index < 5'])
+
+## Website API
 
 
 ## Data Output ---------
@@ -47,7 +95,10 @@ all_data['IBM']['Adj Close']
 price = pd.DataFrame({ticker: data['Adj Close'] for ticker, data in all_data.items()})
 volume = pd.DataFrame({ticker: data['Volume'] for ticker, data in all_data.items()})
 
-
+## Datetime treatment
+close_time = list(map(lambda x: dt.strptime(x, '%Y-%m-%d'), ibm_price['Date']))
+close_time = pd.Series(close_time)
+close_time.dt.year.value_counts()
 
 ## Mathematics -----------
 g = np.array([[2,2,2],[3,3,3]])
