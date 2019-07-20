@@ -10,6 +10,7 @@ import scipy as sp
 import pandas_datareader.data as web
 from datetime import datetime as dt ## datetime
 import json ## json
+import requests ## API
 from lxml import objectify
 import os 
 
@@ -73,7 +74,12 @@ frame.to_hdf(path_hdf, 'obj3', format='table')
 pd.read_hdf(path_hdf, 'obj3', where=['index < 5'])
 
 ## Website API
+ url = 'https://api.github.com/repos/pandas-dev/pandas/issues'
+ resp = requests.get(url)
+ data = resp.json()
+ data[0]['title']
 
+ issues = pd.DataFrame(data, columns=['number','title','labels','state'])
 
 ## Data Output ---------
 mthly_ff.to_csv(os.path.join(data_ouput, 'mthly_ff.csv'), index=False)
