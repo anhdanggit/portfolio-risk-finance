@@ -7,6 +7,7 @@ Date: 2019-07-20
 Description:
 Overview some common tricks in clean and prep data
 '''
+
 ## Import modules
 import pandas as pd
 import numpy as np
@@ -14,6 +15,7 @@ import os
 import scipy as sp
 import matplotlib.pyplot as plt
 from numpy import nan as NA
+import re ## pattern matching, substitution, and splitting
 
 
 ## 1 - Missing Data -------
@@ -107,3 +109,106 @@ pd.cut(ages, 4, precision=2)
 pd.cut(ages, 4, precision=2, labels=group_names)
 
 ## cut by quantiles
+data = np.random.randn(1000)  # Normally distributed
+qtile = pd.qcut(data, 4, precision=2)
+qtile.categories
+pd.value_counts(qtile)
+
+qtile2 = pd.qcut(data, [0, 0.01, 0.05, 0.95, 0.99, 1])
+qtile2.categoriess
+pd.value_counts(qtile2)
+
+
+## 5 - Detect/Filter Out Outliers -------
+data = pd.DataFrame(np.random.randn(1000, 4))
+data.describe()
+col = data.iloc[:,2]
+col[np.abs(col) > 3]
+
+data[(np.abs(data) > 3).any(1)] ## any row with any value at any col > 3
+data[np.abs(data) > 3] = np.sign(data) * 3 ## cap -3 amd 3
+data.describe().T
+
+np.sign(data).head()
+
+
+## 6 - Permutation & Random Sampling -------
+df = pd.DataFrame(np.arange(5 * 4).reshape((5, 4)))
+
+### permutating: randomly reordring the series
+sampler = np.random.permutation(5)
+df.take(sampler)
+df.iloc[sampler, :]
+
+### sampling without replacement
+df.sample(n=3)
+
+choices = pd.Series([5,7,-1,6,4])
+choices.sample(n=10, replace=True)
+
+
+## 7 - Dummy Variables/Indicators -------
+df = pd.DataFrame({'key': ['b', 'b', 'a', 'c', 'a', 'b'],   
+                 'data1': range(6)})
+
+dummies = pd.get_dummies(df['key'], prefix='key')
+df_trans = df[['data1']].join(dummies)
+
+
+## 8 - String Manipulation -------
+val = 'a.b.    eabcd'
+
+### for 1 string
+len(val)
+val.index('b')
+val.find('o') ## not found, return -1
+val.count('b')
+val.replace('.','-')
+
+s1, s2, s3 = val.split('.')
+strings = val.split('.')
+' || '.join(strings)
+
+
+## 9 - Regular Expressions -------
+text = "foo    bar\t baz  \tqux" 
+re.split('\s+', text) ## 1+ whitespace
+
+regex = re.compile('\s+')
+regex.split(text)
+regex.findall(text) ## find all part matched your regex pattern
+
+text = """Dave dave@google.com
+Steve steve@gmail.com
+Rob rob@gmail.com
+Ryan ryan@yahoo.com
+"""
+
+email_pattern = r'[A-Z0-9._%+-]+@[A-Z0-9._]+\.[A-Z]{2,4}'
+regex_email = re.compile(email_pattern, flags=re.IGNORECASE)
+regex_email.findall(text) ## return all matched string
+positions = regex_email.search(text)
+text[positions.start():positions.end()]
+
+print(regex_email.sub('CENSORED', text))
+
+## Concept of Groups in Regex pattern
+email_pattern = r'([A-Z0-9._%+-]+)@([A-Z0-9.-]+)\.([A-Z]{2,4})'
+regex_email_gr = re.compile(email_pattern, flags=re.IGNORECASE)
+m = regex_email_gr.match('hello@gmail.com')
+m.groups()
+
+regex_email_gr.findall(text)
+t = regex_email_gr.sub(r'name: \1, domain(\2), suffix: \3', text) ## access groups by \1, \2
+print(t)
+
+
+## 10 - Vectorize string functions -------
+data = {'Dave': 'dave@google.com', 'Steve': 'steve@gmail.com',
+        'Rob': 'rob@gmail.com', 'Wes': np.nan}
+data = pd.Series(data)
+data.str.contains('gmail') ## put str to vectorize
+
+## Vectorize regex functions
+data.str.findall(email_pattern, flags=re.IGNORECASE)
+data.str[:5]

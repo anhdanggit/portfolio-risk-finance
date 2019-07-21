@@ -71,9 +71,9 @@ frame.sub(series3, axis=0)
 
 
 ## Function Application & Mapping ---------------
-f = lambda x: x.max() - x.min()
-frame.apply(f, axis=0)
-frame.apply(f, axis=1) ## apply to columns -> return rows
+f0 = lambda x: x.max() - x.min()
+frame.apply(f0, axis=0)
+frame.apply(f0, axis=1) ## apply to columns -> return rows
 
 ## Function could return the series with several values
 def f(x):

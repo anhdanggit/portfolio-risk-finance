@@ -9,6 +9,7 @@ Some illustrations for basic concepts in Python
 '''
 
 import numpy as np
+import matplotlib.pyplot as plt
 
 ## Change the type
 arr = np.array(['1','2','3'], dtype='str')
@@ -33,9 +34,9 @@ z = np.sqrt(xs**2 + ys**2)
 points.shape #1000
 xs.shape #1000x1000
 
-import matplotlib.pyplot as plt
-plt.imshow(z, cmap=plt.cm.gray); plt.colorbar()
-plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")
+#plt.imshow(z, cmap=plt.cm.gray); 
+#plt.colorbar()
+#plt.title("Image plot of $\sqrt{x^2 + y^2}$ for a grid of values")
 
 
 # Expressing Conditional Logic as Array Operations

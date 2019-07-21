@@ -65,13 +65,13 @@ for word in words:
 
 ## Functions -----------
 ## Multiple return
-def f():
+def f1():
     a = 5
     b = 6
     c = 7
     return a, b, c
 
-a, b, c = f()
+a, b, c = f1()
 print(a)
 print(c)
 
