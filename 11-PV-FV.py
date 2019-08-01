@@ -1,4 +1,11 @@
 '''
+#FILE: Present Value and Future Value
+Project: portfolio-risk-finance
+-------------------
+By: Anh Dang
+Date: 2019-08-01
+Description:
+
 This is the scripts to play with some fundamental concepts:
 1. Present Value
 2. IRR 
